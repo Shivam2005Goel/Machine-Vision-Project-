@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "test": "vitest run",
     "simulate": "vitest run src/lib/cube/solvingSimulation.test.ts src/lib/cube/isometricGuide.test.ts src/lib/cube/perspectiveCubeCanvas.test.ts src/lib/cube/selfieHoldPose.test.ts src/lib/vision/colorClassifier.test.ts src/lib/vision/scanWhiteCalibration.test.ts",
-    "deploy": "VITE_BASE_PATH=/makemecubemaster/ npm run build && gh-pages -d dist"
+    "deploy": "VITE_BASE_PATH=/Machine-Vision-Project-/ npm run build && gh-pages -d dist"
   },
   "dependencies": {
     "cubejs": "^1.3.2",
