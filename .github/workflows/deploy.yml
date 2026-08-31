@@ -1,0 +1,100 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+        env:
+          VITE_BASE_PATH: /makemecubemaster/
+
+      - name: Stamp deploy
+        run: echo "${{ github.sha }}" > dist/deploy-sha.txt
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy1.outputs.page_url || steps.deploy2.outputs.page_url || steps.deploy3.outputs.page_url || steps.deploy4.outputs.page_url }}
+    steps:
+      - name: Deploy attempt 1
+        id: deploy1
+        continue-on-error: true
+        uses: actions/deploy-pages@v4
+
+      - name: Wait before retry 1
+        if: steps.deploy1.outcome == 'failure'
+        run: sleep 20
+
+      - name: Deploy attempt 2
+        if: steps.deploy1.outcome == 'failure'
+        id: deploy2
+        continue-on-error: true
+        uses: actions/deploy-pages@v4
+
+      - name: Wait before retry 2
+        if: steps.deploy1.outcome == 'failure' && steps.deploy2.outcome == 'failure'
+        run: sleep 40
+
+      - name: Deploy attempt 3
+        if: steps.deploy1.outcome == 'failure' && steps.deploy2.outcome == 'failure'
+        id: deploy3
+        continue-on-error: true
+        uses: actions/deploy-pages@v4
+
+      - name: Wait before retry 3
+        if: steps.deploy1.outcome == 'failure' && steps.deploy2.outcome == 'failure' && steps.deploy3.outcome == 'failure'
+        run: sleep 60
+
+      - name: Deploy attempt 4
+        if: steps.deploy1.outcome == 'failure' && steps.deploy2.outcome == 'failure' && steps.deploy3.outcome == 'failure'
+        id: deploy4
+        continue-on-error: true
+        uses: actions/deploy-pages@v4
+
+      - name: Fail if all deploy attempts failed
+        if: always()
+        run: |
+          if [ "${{ steps.deploy1.outcome }}" = "success" ] || \
+             [ "${{ steps.deploy2.outcome }}" = "success" ] || \
+             [ "${{ steps.deploy3.outcome }}" = "success" ] || \
+             [ "${{ steps.deploy4.outcome }}" = "success" ]; then
+            echo "GitHub Pages deploy succeeded."
+            exit 0
+          fi
+          echo "GitHub Pages deploy failed after 4 attempts."
+          exit 1

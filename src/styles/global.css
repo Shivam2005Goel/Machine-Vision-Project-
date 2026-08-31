@@ -1,0 +1,2859 @@
+:root {
+  color-scheme: dark;
+  font-family:
+    'Inter',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    sans-serif;
+  background: #000;
+  color: #fff;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.app {
+  width: 100%;
+  height: 100%;
+  background: #000;
+  position: relative;
+  --app-title-height: 88px;
+  --touch-target-min: 44px;
+}
+
+.app-header {
+  position: absolute;
+  top: max(6px, env(safe-area-inset-top));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 35;
+  width: max-content;
+  max-width: calc(100% - 24px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  pointer-events: none;
+  user-select: none;
+}
+
+.app-title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  text-align: center;
+}
+
+.app-title-name {
+  width: 100%;
+  text-align: center;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: rgba(255, 255, 255, 0.95);
+  line-height: 1.3;
+}
+
+.app-title-version {
+  margin-left: 0.35em;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: rgba(134, 239, 172, 0.92);
+}
+
+.app-title-credit {
+  width: 100%;
+  text-align: center;
+  margin-top: 0.4em;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  color: rgba(255, 255, 255, 0.62);
+  line-height: 1.3;
+}
+
+.app-phase-bar {
+  margin-top: 6px;
+  pointer-events: auto;
+}
+
+.app-phase-bar-list {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  list-style: none;
+  flex-wrap: wrap;
+}
+
+.app-phase-bar-item {
+  display: contents;
+}
+
+.app-phase-bar-step {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 7px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+  white-space: nowrap;
+  color: rgba(255, 255, 255, 0.38);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.app-phase-bar-step--link {
+  appearance: none;
+  -webkit-appearance: none;
+  box-sizing: border-box;
+  margin: 0;
+  border: none;
+  padding: 3px 7px;
+  font-size: 10px;
+  font-weight: 600;
+  font-family: inherit;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.app-phase-bar-step--link:hover {
+  color: rgba(255, 255, 255, 0.82);
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.app-phase-bar-step--done {
+  color: rgba(255, 255, 255, 0.58);
+}
+
+.app-phase-bar-step--active {
+  color: rgba(255, 255, 255, 0.95);
+  background: rgba(34, 197, 94, 0.22);
+  box-shadow: 0 0 0 1px rgba(134, 239, 172, 0.35);
+}
+
+.app-phase-bar-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  font-size: 9px;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.app-phase-bar-step--active .app-phase-bar-num {
+  background: rgba(134, 239, 172, 0.9);
+  color: #052e16;
+}
+
+.app-phase-bar-step--done .app-phase-bar-num {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.viewport {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #111;
+  --guide-size: min(68vw, 46vh);
+  --guide-top: calc(50% - var(--guide-size) * 0.55);
+  --guide-bottom: calc(50% + var(--guide-size) * 0.45);
+  --scanned-bar-height: 58px;
+}
+
+.camera-feed {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transform: scaleX(-1);
+}
+
+.solving-ar-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  visibility: hidden;
+  z-index: 16;
+  transform: scaleX(-1);
+}
+
+.solving-ar-overlay.active {
+  visibility: visible;
+}
+
+/* Below the solve viewer panel (12) and move hint (14), above the camera feed. */
+.solving-cube-ar-overlay {
+  position: absolute;
+  pointer-events: none;
+  visibility: hidden;
+  z-index: 11;
+  transform: scaleX(-1);
+}
+
+.solving-cube-ar-overlay.active {
+  visibility: visible;
+}
+
+.cube-ar-overlay {
+  position: absolute;
+  pointer-events: none;
+  visibility: hidden;
+  z-index: 7;
+  transform: scaleX(-1);
+}
+
+.cube-ar-overlay.active {
+  visibility: visible;
+}
+
+.face-arrow-overlay,
+.live-ar-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  visibility: hidden;
+  z-index: 7;
+  transform: scaleX(-1);
+}
+
+.face-arrow-overlay.active,
+.live-ar-overlay.active {
+  visibility: visible;
+}
+
+.ar-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.ar-overlay.active {
+  visibility: visible;
+  transform: scaleX(-1);
+}
+
+/* remove old .ar-overlay.mirrored */
+
+.step-indicator {
+  position: absolute;
+  top: max(20px, env(safe-area-inset-top));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 11;
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.viewport--scanning .step-indicator {
+  top: max(calc(var(--scanned-bar-height) + 8px), calc(env(safe-area-inset-top) + var(--scanned-bar-height)));
+}
+
+.calibration-overlay {
+  position: absolute;
+  top: calc(var(--guide-bottom) + 12px);
+  bottom: auto;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(90vw, 360px);
+  text-align: center;
+  padding: 16px 20px;
+  border-radius: 20px;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  max-height: calc(100% - var(--guide-bottom) - 24px);
+  overflow-y: auto;
+  pointer-events: none;
+}
+
+.calibration-overlay .capture-button,
+.calibration-overlay .color-reset-button {
+  pointer-events: auto;
+}
+
+.calibration-hint {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.calibration-hint--muted {
+  font-size: 12px;
+  font-weight: 500;
+  opacity: 0.72;
+  margin-bottom: 4px;
+}
+
+.calibration-distance {
+  font-size: 12px;
+  opacity: 0.72;
+  margin-bottom: 12px;
+}
+
+.calibration-sub {
+  margin-top: 10px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.calibration-bar {
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.15);
+  overflow: hidden;
+}
+
+.calibration-fill {
+  height: 100%;
+  background: #fff;
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+.scanned-faces-bar {
+  position: absolute;
+  top: calc(max(8px, env(safe-area-inset-top)) + var(--app-title-height) + 4px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 30;
+  width: max-content;
+  max-width: calc(100% - 20px);
+  padding: 8px 12px 10px;
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.42);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  pointer-events: none;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25);
+  overflow: visible;
+}
+
+.scanned-faces-bar--interactive {
+  pointer-events: auto;
+}
+
+.scanned-faces-bar-hint {
+  display: none;
+}
+
+.scanned-faces-bar-title {
+  margin: 0 0 4px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.75);
+  text-align: center;
+}
+
+.scanned-faces-bar-grid {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: visible;
+  padding: 4px 3px 2px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.scanned-faces-bar-grid::-webkit-scrollbar {
+  display: none;
+}
+
+.face-grid-mini--guide {
+  opacity: 1;
+}
+
+.face-grid-mini-cell--guide-center {
+  opacity: 1;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.25);
+}
+
+.face-grid-mini--guide .face-grid-mini-cell--placeholder:not(.face-grid-mini-cell--guide-center) {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+.face-grid-mini--next {
+  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.85);
+  border-radius: 6px;
+}
+
+.face-grid-mini {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: none;
+  padding: 2px;
+  margin: 0;
+  background: transparent;
+  font: inherit;
+  color: inherit;
+  box-sizing: border-box;
+}
+
+.face-grid-mini--clickable {
+  cursor: pointer;
+  border-radius: 6px;
+  padding: 2px;
+  transition: background 0.15s ease, box-shadow 0.15s ease;
+  box-sizing: border-box;
+}
+
+.face-grid-mini--clickable:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.face-grid-mini--clickable:active {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.face-grid-mini--selected {
+  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.95);
+  background: rgba(96, 165, 250, 0.12);
+}
+
+.face-grid-mini--empty {
+  opacity: 1;
+}
+
+.scanned-faces-bar .face-color-grid--mini {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.face-color-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 20px);
+  gap: 2px;
+  padding: 3px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.face-color-grid--mini {
+  grid-template-columns: repeat(3, 11px);
+  gap: 1px;
+  padding: 2px;
+  border-radius: 4px;
+}
+
+.face-color-grid--overlay {
+  grid-template-columns: repeat(3, 20px);
+  gap: 2px;
+  padding: 3px;
+  border-radius: 6px;
+}
+
+.face-color-grid--placeholder {
+  /* placeholder grid matches live grid layout */
+}
+
+.face-grid-mini-cell {
+  width: 11px;
+  height: 11px;
+  border-radius: 2px;
+  border: 1px solid rgba(0, 0, 0, 0.25);
+}
+
+.face-grid-mini-cell--placeholder {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+.primary-button {
+  position: absolute;
+  bottom: max(40px, env(safe-area-inset-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 14px 28px;
+  border: none;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  color: #000;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.primary-button:active {
+  transform: translateX(-50%) scale(0.97);
+  opacity: 0.9;
+}
+
+.solved-celebration {
+  position: absolute;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 35%, rgba(255, 210, 90, 0.18), transparent 55%),
+    rgba(0, 0, 0, 0.62);
+  animation: solved-celebration-fade-in 0.55s ease-out;
+}
+
+.solved-celebration-confetti {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.solved-celebration-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  width: min(92vw, 420px);
+  pointer-events: none;
+  animation: solved-celebration-rise 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.solved-celebration-content .error-button {
+  pointer-events: auto;
+}
+
+.solved-celebration-title {
+  margin: 0;
+  font-size: clamp(42px, 12vw, 64px);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: #fff8e8;
+  text-shadow:
+    0 0 24px rgba(255, 214, 102, 0.75),
+    0 4px 18px rgba(0, 0, 0, 0.45);
+  animation: solved-celebration-title-pop 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes solved-celebration-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes solved-celebration-rise {
+  from {
+    opacity: 0;
+    transform: translateY(28px) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes solved-celebration-title-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.55);
+  }
+  70% {
+    transform: scale(1.08);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.solved-banner {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(4px);
+}
+
+.solved-banner p {
+  font-size: 32px;
+  font-weight: 600;
+}
+
+.loading-screen,
+.error-screen {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  background: #000;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.loading-screen.overlay,
+.error-screen.overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.loading-screen-version {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: rgba(134, 239, 172, 0.88);
+}
+
+.loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.error-screen p,
+.error-message {
+  max-width: min(90%, 360px);
+  text-align: center;
+  line-height: 1.5;
+  color: #ff6b6b;
+}
+
+.error-screen--rescan {
+  justify-content: flex-start;
+  padding: calc(max(8px, env(safe-area-inset-top)) + var(--app-title-height) + 8px) 16px 24px;
+  gap: 0;
+}
+
+.error-screen--rescan .scanned-faces-bar {
+  position: relative;
+  top: auto;
+  left: auto;
+  transform: none;
+  margin: 0 auto 20px;
+  flex-shrink: 0;
+}
+
+.error-screen-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 0;
+  padding: 0 8px;
+}
+
+.error-rescan-hint {
+  max-width: min(90%, 360px);
+  text-align: center;
+  line-height: 1.5;
+  font-size: 15px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.error-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.error-button {
+  min-width: 200px;
+  padding: 14px 24px;
+  border: none;
+  border-radius: 999px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.error-button.primary {
+  background: rgba(255, 255, 255, 0.95);
+  color: #000;
+}
+
+.error-button.secondary {
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.error-button:active {
+  transform: scale(0.97);
+  opacity: 0.9;
+}
+
+/* ── 큐브 인식 피드백 ── */
+.detection-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.guide-overlay-root {
+  position: absolute;
+  inset: 0;
+  z-index: 9;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.guide-frame-css {
+  position: absolute;
+  border: 3px dashed rgba(255, 255, 255, 0.92);
+  border-radius: 12px;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.65),
+    0 0 18px rgba(255, 255, 255, 0.28);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.guide-spot-css {
+  position: absolute;
+  border: 3px solid #ffffff;
+  border-radius: 6px;
+  background: transparent;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.scan-ui-panel {
+  position: absolute;
+  width: auto;
+  max-width: min(34vw, 120px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  z-index: 6;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.scan-ui-panel--compact {
+  width: auto;
+  max-width: min(92vw, 200px);
+}
+
+.scan-ui-panel .capture-button {
+  pointer-events: auto;
+}
+
+.wb-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.scan-ready-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.guide-inset-panel,
+.guide-action-panel {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  pointer-events: auto;
+  text-align: center;
+}
+
+.guide-action-panel--below,
+.scan-ready-panel--below,
+.color-learn-below-guide {
+  justify-content: flex-start;
+  padding: 8px 4px max(8px, env(safe-area-inset-bottom));
+}
+
+.scan-ready-sub {
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.35;
+  color: rgba(255, 255, 255, 0.72);
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.75);
+}
+
+.scan-ready-in-guide .capture-button,
+.scan-ready-panel .capture-button,
+.guide-action-panel .capture-button {
+  width: 100%;
+  max-width: 220px;
+  margin-top: 0;
+  flex-shrink: 0;
+}
+
+.scan-ready-in-guide .keyboard-hint,
+.scan-ready-panel .keyboard-hint,
+.guide-action-panel .keyboard-hint {
+  margin-top: 0;
+  font-size: 10px;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.75);
+}
+
+.scan-ready-reset,
+.live-scan-reset,
+.color-reset-button {
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.color-reset-button--compact {
+  width: auto;
+  margin: 8px auto 0;
+  padding: 7px 12px;
+  font-size: 11px;
+}
+
+.keyboard-hint {
+  margin: 4px 0 0;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.62);
+  display: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .keyboard-hint--keys {
+    display: block;
+  }
+}
+
+.keyboard-hint kbd {
+  display: inline-block;
+  min-width: 1.6em;
+  padding: 1px 6px;
+  margin: 0 1px;
+  border-radius: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  background: rgba(255, 255, 255, 0.12);
+  font-size: 10px;
+  font-weight: 700;
+  font-family: inherit;
+  text-align: center;
+}
+
+.color-learn-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.color-learn-below-guide {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  pointer-events: auto;
+  text-align: center;
+}
+
+.color-learn-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  width: 100%;
+}
+
+.color-learn-prompt {
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.3;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.75);
+}
+
+.color-learn-step {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.72);
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.75);
+}
+
+.color-learn-swatch {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  flex-shrink: 0;
+}
+
+.color-learn-error {
+  font-size: 11px;
+  color: #fca5a5;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.75);
+}
+
+.color-learn-below-guide .capture-button,
+.guide-action-panel .capture-button--primary {
+  width: 100%;
+  max-width: 220px;
+  margin-top: 0;
+  flex-shrink: 0;
+}
+
+.color-learn-below-guide .keyboard-hint,
+.guide-action-panel .keyboard-hint {
+  margin-top: 0;
+  font-size: 10px;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.75);
+}
+
+.wb-panel {
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  pointer-events: auto;
+  width: min(92vw, 300px);
+}
+
+.wb-step {
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 2px;
+}
+
+.wb-title {
+  font-size: 17px;
+  font-weight: 600;
+  margin-bottom: 4px;
+  text-align: center;
+}
+
+.wb-hint {
+  font-size: 13px;
+  opacity: 0.8;
+  text-align: center;
+  margin-bottom: 4px;
+}
+
+.wb-distance-hint {
+  font-size: 11px;
+  opacity: 0.65;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.wb-meter {
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.06);
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.wb-preview-swatch {
+  width: 36px;
+  height: 36px;
+  margin: 0 auto 6px;
+  border-radius: 8px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+}
+
+.wb-status {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.wb-status.ready {
+  color: #86efac;
+}
+
+.wb-warmth {
+  margin-top: 4px;
+  font-size: 12px;
+  opacity: 0.75;
+}
+
+.wb-rgb {
+  margin-top: 6px;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.85;
+}
+
+.wb-error {
+  margin-top: 6px;
+  font-size: 11px;
+  color: #fca5a5;
+  text-align: center;
+}
+
+.wb-guide-note {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: calc(var(--guide-bottom) + 10px);
+  width: min(90vw, 320px);
+  text-align: center;
+  font-size: 12px;
+  opacity: 0.65;
+  pointer-events: none;
+}
+
+.detection-svg,
+.detected-quad,
+.detected-grid,
+.corner-dot {
+  display: none;
+}
+
+.detection-ui {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.capture-button {
+  margin-top: 8px;
+  width: 100%;
+  min-height: var(--touch-target-min);
+  padding: 12px 16px;
+  border: none;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.95);
+  color: #000;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  pointer-events: auto;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.capture-button--primary {
+  min-height: var(--touch-target-min);
+}
+
+.capture-button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.capture-button:not(:disabled):active {
+  transform: scale(0.98);
+}
+
+.detection-status {
+  position: relative;
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 36px;
+  height: 36px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  font-size: 13px;
+  font-weight: 500;
+  overflow: hidden;
+}
+
+.detection-status .status-text {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.detection-status.stabilizing .status-text {
+  font-variant-numeric: tabular-nums;
+}
+
+.detection-status.searching .status-dot {
+  background: #facc15;
+  animation: pulse 1.2s ease infinite;
+}
+
+.detection-status.detected .status-dot {
+  background: #60a5fa;
+}
+
+.detection-status.weak-read .status-dot {
+  background: #facc15;
+}
+
+.detection-status.stabilizing .status-dot {
+  background: #22c55e;
+  animation: pulse 0.6s ease infinite;
+}
+
+.detection-status.captured .status-dot {
+  background: #22c55e;
+}
+
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.status-progress {
+  font-variant-numeric: tabular-nums;
+  opacity: 0.8;
+}
+
+.color-counts {
+  position: relative;
+  padding: 10px 14px;
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.color-counts-title {
+  font-size: 11px;
+  opacity: 0.7;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.color-counts-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 6px;
+}
+
+.color-count-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.color-swatch {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  flex-shrink: 0;
+}
+
+.color-count-item .color-swatch {
+  width: 22px;
+  height: 22px;
+}
+
+.color-count-label {
+  font-size: 11px;
+  opacity: 0.85;
+}
+
+.color-count-value {
+  font-size: 15px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.cell-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 20px);
+  gap: 2px;
+  padding: 3px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.cell-grid-item {
+  width: 20px;
+  height: 20px;
+  border-radius: 3px;
+  border: 1px solid rgba(0, 0, 0, 0.3);
+}
+
+.stabilize-bar {
+  position: relative;
+  align-self: center;
+  width: 120px;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.2);
+  overflow: hidden;
+}
+
+.stabilize-fill {
+  height: 100%;
+  background: #22c55e;
+  border-radius: 2px;
+  transition: width 0.15s ease;
+}
+
+.calibration-step {
+  font-size: 13px;
+  opacity: 0.7;
+  margin-bottom: 4px;
+}
+
+.calibration-sub strong {
+  font-weight: 600;
+}
+
+.face-chips {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.face-chip {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.face-chip.known {
+  background: rgba(34, 197, 94, 0.35);
+  color: #fff;
+  border-color: rgba(134, 239, 172, 0.5);
+}
+
+.face-chip.active {
+  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.8);
+}
+
+.live-scan-remaining {
+  margin-top: 8px;
+  font-size: 11px;
+  opacity: 0.65;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(0.85);
+  }
+}
+
+.solving-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 8;
+}
+
+.solving-banner {
+  position: absolute;
+  bottom: max(28px, env(safe-area-inset-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  padding: 16px 24px;
+  border-radius: 16px;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  pointer-events: none;
+  min-width: min(92vw, 320px);
+}
+
+.solving-visual-hint {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.solving-center-swatch {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25);
+  flex-shrink: 0;
+}
+
+.solving-rotation {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.solving-hint {
+  font-size: 13px;
+  opacity: 0.75;
+}
+
+.solving-hint--wrong {
+  color: #ff8a80;
+  opacity: 1;
+}
+
+.solving-progress {
+  margin-top: 10px;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.2);
+  overflow: hidden;
+}
+
+.solving-progress-fill {
+  height: 100%;
+  border-radius: 2px;
+  background: #ffffff;
+  transition: width 0.12s linear;
+}
+
+.solving-skip {
+  position: absolute;
+  top: max(16px, env(safe-area-inset-top));
+  right: max(16px, env(safe-area-inset-right));
+  pointer-events: auto;
+  padding: 8px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.45);
+  color: #fff;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.solving-skip:active {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* ── Solving move hint (right side) ── */
+.solving-move-hint {
+  position: absolute;
+  z-index: 14;
+  width: min(54vw, 360px);
+  pointer-events: none;
+}
+
+.solving-move-hint-card {
+  padding: 10px 12px 12px;
+  border-radius: 18px;
+  background: rgba(0, 0, 0, 0.42);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25);
+}
+
+.solving-move-hint-card--wrong {
+  box-shadow:
+    0 4px 18px rgba(0, 0, 0, 0.25),
+    0 0 0 2px rgba(255, 107, 107, 0.55);
+}
+
+.solving-move-hint-header {
+  margin-bottom: 8px;
+}
+
+.solving-move-hint-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 0;
+}
+
+.solving-move-hint-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
+  min-width: 0;
+}
+
+.solving-move-hint-step {
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.72);
+  letter-spacing: 0.03em;
+}
+
+.solving-move-hint-step-badge {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 1px;
+  flex-shrink: 0;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  max-width: 100%;
+}
+
+.solving-move-hint-step-current {
+  font-size: clamp(15px, 4.2vw, 20px);
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: 0.02em;
+}
+
+.solving-move-hint-step-sep {
+  font-size: clamp(11px, 3.2vw, 14px);
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.45);
+  margin: 0 1px;
+}
+
+.solving-move-hint-step-total {
+  font-size: clamp(11px, 3.2vw, 14px);
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.solving-move-hint-move {
+  display: block;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+  font-size: clamp(18px, 4.8vw, 22px);
+  font-weight: 800;
+  color: #facc15;
+  letter-spacing: 0.04em;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+
+.solving-move-hint-move--side {
+  display: block;
+  text-align: center;
+  font-size: 22px;
+  line-height: 1.2;
+}
+
+.solving-move-hint-nav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.solving-move-hint-autoplay-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  pointer-events: auto;
+  cursor: pointer;
+  user-select: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.solving-move-hint-autoplay-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.78);
+  letter-spacing: 0.02em;
+}
+
+.solving-move-hint-autoplay-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.solving-move-hint-autoplay-switch {
+  position: relative;
+  flex-shrink: 0;
+  width: 44px;
+  height: 26px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.22);
+  transition: background 0.2s ease;
+}
+
+.solving-move-hint-autoplay-switch::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.28);
+  transition: transform 0.2s ease;
+}
+
+.solving-move-hint-autoplay-input:checked + .solving-move-hint-autoplay-switch {
+  background: rgba(134, 239, 172, 0.92);
+}
+
+.solving-move-hint-autoplay-input:checked + .solving-move-hint-autoplay-switch::after {
+  transform: translateX(18px);
+}
+
+.solving-move-hint-autoplay-input:focus-visible + .solving-move-hint-autoplay-switch {
+  outline: 2px solid rgba(134, 239, 172, 0.85);
+  outline-offset: 2px;
+}
+
+.solving-move-hint-prev,
+.solving-move-hint-next,
+.solving-move-hint-skip {
+  pointer-events: auto;
+  border: none;
+  border-radius: 999px;
+  min-height: var(--touch-target-min);
+  min-width: var(--touch-target-min);
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.12);
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.solving-move-hint-prev:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.solving-move-hint-stage {
+  position: relative;
+  width: 100%;
+  padding: 0;
+}
+
+.solving-move-hint-stage-body {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr) 72px;
+  align-items: stretch;
+  gap: 6px;
+  min-width: 0;
+}
+
+.solving-move-hint-stage-center {
+  display: flex;
+  justify-content: center;
+  min-width: 0;
+}
+
+.solving-move-hint-stage-side {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 72px;
+  min-width: 0;
+  padding: 0 2px;
+}
+
+.solving-move-hint-stage-side--move {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 2px;
+}
+
+.solving-cube-guide-shell {
+  position: relative;
+  --solving-cube-height: 188px;
+  --solving-cube-shell-height-mobile: 168px;
+  height: var(--solving-cube-height);
+  border-radius: 10px;
+  overflow: hidden;
+  background: transparent;
+}
+
+.solving-cube-guide-shell--compact {
+  height: var(--solving-cube-shell-height-mobile);
+}
+
+.solving-cube-guide-move-slot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  min-width: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.solving-cube-guide-move-slot--overlay-top {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 14%;
+  transform: translateY(-50%);
+  padding: 0 8px;
+}
+
+.solving-cube-guide-move-slot--overlay-side {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 38%;
+  justify-content: center;
+  padding-right: 8%;
+  padding-left: 2%;
+}
+
+.solving-cube-guide-viewport {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.selfie-cube-guide {
+  width: 100%;
+  height: 196px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #111827;
+}
+
+.solving-cube-guide {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  border-radius: 0;
+  overflow: hidden;
+  background: transparent;
+  line-height: 0;
+}
+
+.solving-cube-guide-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.selfie-cube-guide-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  /* Match front-camera selfie preview (horizontal mirror) */
+  transform: scaleX(-1);
+}
+
+.scan-cube-guide {
+  width: 100%;
+  height: 196px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #111827;
+}
+
+.scan-cube-guide-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform: scaleX(-1);
+}
+
+.iso-scan-cube-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 8px;
+  background: #111827;
+  border-radius: 8px;
+  padding: 4px;
+  width: 100%;
+}
+
+.iso-scan-cube-wrap--back .iso-cube-guide-svg--scan {
+  animation: iso-back-spin 0.72s ease-out;
+}
+
+@keyframes iso-back-spin {
+  0% {
+    filter: brightness(1);
+  }
+  40% {
+    filter: brightness(1.15);
+  }
+  100% {
+    filter: brightness(1);
+  }
+}
+
+.iso-scan-cube-caption {
+  font-size: 11px;
+  font-weight: 600;
+  color: #86efac;
+  text-align: center;
+}
+
+.iso-cube-guide-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: 200px;
+  margin: 0 auto;
+  background: #111827;
+  border-radius: 4px;
+  aspect-ratio: 1;
+}
+
+.iso-cube-guide-svg--scan {
+  max-width: 100%;
+}
+
+.iso-cube-guide-face-bg {
+  fill: #f8fafc;
+  fill-opacity: 1;
+}
+
+.iso-cube-guide-grid path {
+  stroke: rgba(10, 10, 10, 0.85);
+  stroke-width: 1.1;
+}
+
+.iso-cube-guide-face-outline {
+  stroke: rgba(255, 255, 255, 0.92);
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+
+.iso-cube-guide-cell {
+  fill-opacity: 1;
+  stroke-opacity: 1;
+}
+
+.iso-cube-guide-cell--empty {
+  fill: #f8fafc;
+  stroke: #f8fafc;
+}
+
+.iso-cube-guide-cell--preview {
+  stroke-width: 0.35;
+}
+
+.iso-cube-guide-cell--scanned {
+  stroke-width: 0.35;
+}
+
+.iso-cube-guide-cell--turn {
+  stroke: #ffffff;
+  stroke-width: 2.2;
+}
+
+.iso-cube-guide-face-label {
+  display: none;
+}
+
+.iso-cube-guide-arrow-path {
+  stroke: #ffffff;
+  stroke-width: 3.5;
+  stroke-linecap: round;
+}
+
+.iso-cube-guide-arrow-head {
+  fill: #ffffff;
+}
+
+.scan-ui-panel.scan-ui-panel--iso {
+  max-width: min(48vw, 228px);
+  min-width: 200px;
+  padding: 10px 10px 8px;
+  background: rgba(17, 24, 39, 0.94);
+  border-radius: 12px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  overflow: visible;
+}
+
+.scan-ui-panel.scan-ui-panel--live {
+  box-sizing: border-box;
+  max-width: min(44vw, 200px);
+  min-width: 168px;
+  padding: 8px 8px 6px;
+  background: rgba(17, 24, 39, 0.94);
+  border-radius: 12px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  overflow: hidden;
+  gap: 6px;
+  display: flex;
+  flex-direction: column;
+}
+
+.scan-ui-panel.scan-ui-panel--dock {
+  min-width: 0;
+  max-width: none;
+  padding: 10px 12px 8px;
+  gap: 8px;
+  transform: none;
+}
+
+.live-scan-dock-meta {
+  width: 100%;
+  flex-shrink: 0;
+  min-height: 32px;
+}
+
+.live-scan-dock-count {
+  margin: 0 0 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.78);
+  white-space: nowrap;
+  text-align: center;
+  line-height: 1.2;
+  min-height: 16px;
+}
+
+.live-scan-dock-bar {
+  margin: 0;
+}
+
+.scan-ui-panel--dock .scan-live-preview {
+  width: min(100%, 132px);
+  margin: 0 auto;
+}
+
+.scan-live-preview {
+  width: 100%;
+  aspect-ratio: 1;
+  flex-shrink: 0;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.scan-live-preview-empty {
+  width: 100%;
+  height: 100%;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.scan-live-preview .face-color-grid--overlay {
+  width: 100%;
+  max-width: none;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 3px;
+  padding: 4px;
+  box-sizing: border-box;
+}
+
+.scan-live-preview .face-color-grid--overlay .cell-grid-item {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+}
+
+.face-cell--uncertain,
+.face-grid-mini-cell.face-cell--uncertain {
+  background: rgba(255, 255, 255, 0.12) !important;
+  border: 1px dashed rgba(255, 255, 255, 0.35);
+  box-sizing: border-box;
+}
+
+.solving-move-hint-stage .selfie-cube-guide {
+  height: 196px;
+}
+
+.solving-move-hint-stage .iso-cube-guide-svg {
+  max-width: 100%;
+  background: transparent;
+  border-radius: 10px;
+  padding: 4px;
+}
+
+.solving-move-hint-dir {
+  font-size: 22px;
+  font-weight: 700;
+  color: #fde047;
+  line-height: 1;
+}
+
+.solving-move-hint-arrow {
+  display: none;
+}
+
+.solving-move-hint-meters {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.solving-move-hint-dir {
+  font-size: 20px;
+  font-weight: 800;
+  color: #fde047;
+  line-height: 1;
+}
+
+.solving-move-hint-badge,
+.solving-move-hint-action {
+  display: none;
+}
+
+.solving-move-hint-progress {
+  margin-top: 10px;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  overflow: hidden;
+}
+
+.solving-move-hint-progress-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #34d399, #facc15);
+  transition: width 0.12s ease-out;
+}
+
+.solving-move-hint-status {
+  margin: 8px 0 0;
+  text-align: center;
+  font-size: clamp(10px, 2.8vw, 11px);
+  font-weight: 600;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.82);
+  overflow-wrap: anywhere;
+  hyphens: auto;
+}
+
+/* ── Static solving guide (fixed face + rotation arrow) ── */
+.viewport--solving::before {
+  content: none;
+}
+
+.solving-guide-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 12;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: max(10px, env(safe-area-inset-right));
+  pointer-events: none;
+}
+
+.solving-guide-card {
+  position: relative;
+  width: min(46vw, 210px);
+  padding: 10px 12px 12px;
+  border-radius: 18px;
+  background: rgba(12, 12, 16, 0.42);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.12);
+}
+
+.solving-guide-dir-label {
+  margin: 0 0 8px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.solving-guide-stage {
+  position: relative;
+  width: 100%;
+}
+
+.solving-guide-card--wrong {
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.4),
+    0 0 0 2px rgba(255, 107, 107, 0.55);
+}
+
+.face-color-grid--solving {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  width: 100%;
+  aspect-ratio: 1;
+  padding: 8px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.22);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+.solving-face-cell {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 6px;
+  border: 2px solid rgba(0, 0, 0, 0.28);
+  opacity: 0.72;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.solving-guide-stage .face-color-grid--solving {
+  width: 100%;
+  margin: 0;
+}
+
+.solving-guide-rotation-badge {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  pointer-events: none;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.38);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.solving-guide-rotation-badge--wrong {
+  background: rgba(80, 0, 0, 0.42);
+}
+
+.solving-guide-rotation-symbol {
+  font-size: 42px;
+  font-weight: 800;
+  line-height: 1;
+  color: #facc15;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.65);
+}
+
+.solving-guide-rotation-badge--wrong .solving-guide-rotation-symbol {
+  color: #ff8a80;
+}
+
+.solving-guide-rotation-turns {
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.02em;
+}
+
+.solving-guide-rotation-direction {
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.82);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.viewport--solving .solving-skip {
+  left: auto;
+  right: max(16px, env(safe-area-inset-right));
+}
+
+/* Center scan zone — live feedback while cube stays in middle */
+.solving-scan-zone-root {
+  position: absolute;
+  inset: 0;
+  z-index: 11;
+  pointer-events: none;
+}
+
+.solving-scan-zone {
+  position: absolute;
+  border-radius: 16px;
+  border: 3px dashed rgba(255, 255, 255, 0.55);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.45);
+}
+
+.solving-scan-zone--searching {
+  border-color: rgba(250, 204, 21, 0.75);
+  animation: solving-scan-pulse 1.2s ease-in-out infinite;
+}
+
+.solving-scan-zone--locked {
+  border-color: rgba(74, 222, 128, 0.9);
+  border-style: solid;
+  box-shadow: 0 0 18px rgba(74, 222, 128, 0.35);
+}
+
+.solving-scan-zone--rotating {
+  border-color: rgba(96, 165, 250, 0.95);
+  border-style: solid;
+  box-shadow: 0 0 22px rgba(96, 165, 250, 0.4);
+}
+
+.solving-scan-zone--lost {
+  border-color: rgba(248, 113, 113, 0.85);
+  animation: solving-scan-pulse 0.8s ease-in-out infinite;
+}
+
+.solving-scan-zone-ring {
+  position: absolute;
+  inset: -4px;
+  border-radius: 18px;
+  background: conic-gradient(
+    rgba(96, 165, 250, 0.85) 0deg,
+    rgba(96, 165, 250, 0.85) var(--scan-progress, 0deg),
+    transparent var(--scan-progress, 0deg),
+    transparent 360deg
+  );
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  -webkit-mask-composite: xor;
+  padding: 4px;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.solving-scan-zone--rotating .solving-scan-zone-ring {
+  opacity: 1;
+}
+
+.solving-scan-zone-dot {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #facc15;
+}
+
+.solving-scan-zone-hint {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0;
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.75);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+  pointer-events: none;
+}
+
+.solving-scan-zone--locked .solving-scan-zone-dot {
+  background: #4ade80;
+  box-shadow: 0 0 8px rgba(74, 222, 128, 0.8);
+}
+
+.solving-scan-zone--rotating .solving-scan-zone-dot {
+  background: #60a5fa;
+  animation: solving-dot-pulse 0.5s ease-in-out infinite;
+}
+
+.solving-scan-zone--lost .solving-scan-zone-dot {
+  background: #f87171;
+}
+
+@keyframes solving-scan-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+@keyframes solving-dot-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.35);
+  }
+}
+
+.solving-scan-rotation-track {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  white-space: nowrap;
+}
+
+.solving-scan-rotation-axis {
+  font-size: 15px;
+  font-weight: 800;
+  color: #f8fafc;
+  letter-spacing: 0.04em;
+}
+
+.solving-scan-rotation-symbol {
+  font-size: 20px;
+  line-height: 1;
+  color: #60a5fa;
+}
+
+.solving-scan-rotation-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.solving-scan-rotation-pct {
+  font-size: 11px;
+  font-weight: 700;
+  color: #93c5fd;
+  min-width: 2.5em;
+  text-align: right;
+}
+
+.solving-scan-faces {
+  position: absolute;
+  left: 50%;
+  bottom: 10px;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.solving-scan-face {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+
+.solving-scan-face-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.solving-scan-face .face-color-grid--mini {
+  width: 44px;
+  height: 44px;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.35);
+}
+
+.solving-scan-face-placeholder {
+  width: 44px;
+  height: 44px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px dashed rgba(255, 255, 255, 0.35);
+}
+
+/* 3-face scan status panel */
+.solving-face-status {
+  position: absolute;
+  top: max(52px, calc(env(safe-area-inset-top) + 44px));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 14;
+  width: min(94vw, 380px);
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(8, 10, 16, 0.78);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+  pointer-events: auto;
+}
+
+.solving-face-status--all-locked {
+  box-shadow:
+    0 6px 20px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(74, 222, 128, 0.55);
+}
+
+.solving-face-status--partial {
+  box-shadow:
+    0 6px 20px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(250, 204, 21, 0.5);
+}
+
+.solving-face-status--lost {
+  box-shadow:
+    0 6px 20px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(248, 113, 113, 0.55);
+}
+
+.solving-face-status-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.solving-face-status-title {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #e2e8f0;
+}
+
+.solving-face-status-summary {
+  flex: 1;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.solving-face-status-skip {
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.solving-face-status-chips {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.solving-face-chip {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 4px 8px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+}
+
+.solving-face-chip--locked {
+  background: rgba(74, 222, 128, 0.14);
+}
+
+.solving-face-chip--scanning {
+  background: rgba(250, 204, 21, 0.12);
+}
+
+.solving-face-chip--missing {
+  background: rgba(248, 113, 113, 0.1);
+}
+
+.solving-face-chip-id {
+  font-size: 15px;
+  font-weight: 800;
+  color: #f8fafc;
+}
+
+.solving-face-chip-state {
+  font-size: 10px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.solving-face-chip-score {
+  font-size: 10px;
+  font-weight: 700;
+  color: #93c5fd;
+}
+
+.solving-face-chip-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  width: var(--match, 0%);
+  background: linear-gradient(90deg, #60a5fa, #4ade80);
+  border-radius: 0 2px 0 0;
+}
+
+.solving-face-status-rotation {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.solving-face-status-axis {
+  font-size: 14px;
+  font-weight: 800;
+  color: #f8fafc;
+}
+
+.solving-face-status-symbol {
+  font-size: 18px;
+  color: #60a5fa;
+}
+
+.solving-face-status-dir {
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.solving-face-status-pct {
+  font-size: 11px;
+  font-weight: 700;
+  color: #93c5fd;
+}
+
+.viewport--solve-viewer .camera-feed {
+  height: 42%;
+}
+
+.solve-viewer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 58%;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(180deg, rgba(18, 18, 22, 0.55) 0%, rgba(10, 10, 14, 0.96) 28%);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 10px 12px max(12px, env(safe-area-inset-bottom));
+  gap: 8px;
+  z-index: 12;
+}
+
+.solve-viewer-cube-wrap {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 120px;
+  border-radius: 14px;
+  background: radial-gradient(circle at 50% 35%, rgba(255, 255, 255, 0.08), rgba(0, 0, 0, 0.2));
+  overflow: hidden;
+}
+
+.solve-viewer-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.solve-viewer-done {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.solve-viewer-moves {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  max-height: 96px;
+  overflow-y: auto;
+  padding: 2px;
+}
+
+.solve-move-btn {
+  min-width: 38px;
+  padding: 6px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 12px;
+  font-weight: 600;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  cursor: pointer;
+}
+
+.solve-move-btn--active {
+  background: rgba(255, 255, 255, 0.92);
+  color: #111;
+  border-color: transparent;
+  transform: scale(1.05);
+}
+
+.solve-move-btn--done {
+  opacity: 0.45;
+}
+
+.solve-move-btn:disabled {
+  cursor: default;
+}
+
+.solve-viewer-autoplay {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.78);
+  align-self: flex-end;
+}
+
+.solve-viewer-autoplay input {
+  width: 16px;
+  height: 16px;
+}
+
+/* ── Mobile / touch-first layout ── */
+@media (max-width: 520px) {
+  .app {
+    --app-title-height: 96px;
+  }
+
+  .app-title-name {
+    font-size: 16px;
+  }
+
+  .app-title-version {
+    font-size: 12px;
+  }
+
+  .app-title-credit {
+    font-size: 11px;
+  }
+
+  .app-phase-bar-step {
+    padding: 5px 7px;
+    font-size: 10px;
+  }
+
+  .scanned-faces-bar-title {
+    font-size: 11px;
+  }
+
+  .calibration-overlay {
+    width: min(94vw, 360px);
+    padding: 12px 14px;
+    top: calc(var(--guide-bottom) + 8px);
+  }
+
+  .calibration-hint {
+    font-size: 16px;
+  }
+
+  .scan-ui-panel.scan-ui-panel--dock {
+    padding: 10px 12px max(10px, env(safe-area-inset-bottom));
+  }
+
+  .live-scan-dock-count {
+    font-size: 13px;
+  }
+
+  .detection-status {
+    min-height: 34px;
+    height: 34px;
+    padding: 0 8px;
+    font-size: 11px;
+  }
+
+  .scan-live-preview .face-color-grid--overlay {
+    gap: 2px;
+    padding: 3px;
+  }
+
+  .color-learn-prompt {
+    font-size: 15px;
+  }
+
+  .color-learn-step {
+    font-size: 12px;
+  }
+
+  .scan-ready-sub {
+    font-size: 12px;
+  }
+
+  .solving-move-hint {
+    width: calc(100% - 16px) !important;
+  }
+
+  .solving-move-hint--compact {
+    --solving-hint-gutter: 10px;
+    --solving-hint-side: 78px;
+    --solving-hint-gap: 8px;
+  }
+
+  .solving-move-hint-card {
+    pointer-events: auto;
+    padding: 6px 10px 4px;
+  }
+
+  .solving-move-hint--compact .solving-move-hint-header {
+    margin-bottom: 4px;
+  }
+
+  .solving-move-hint--compact .solving-move-hint-header-row,
+  .solving-move-hint--compact .solving-move-hint-stage-body {
+    display: grid;
+    grid-template-columns: var(--solving-hint-side) minmax(0, 1fr) var(--solving-hint-side);
+    column-gap: var(--solving-hint-gap);
+    align-items: center;
+  }
+
+  .solving-move-hint--compact .solving-move-hint-step-badge {
+    grid-column: 1;
+    display: inline-flex;
+    align-items: baseline;
+    gap: 1px;
+    padding: 0 0 0 var(--solving-hint-gutter);
+    min-height: unset;
+    min-width: unset;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+  }
+
+  .solving-move-hint--compact .solving-move-hint-step-current,
+  .solving-move-hint--compact .solving-move-hint-step-total {
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  .solving-move-hint--compact .solving-move-hint-step-sep {
+    font-size: 15px;
+    font-weight: 600;
+    margin: 0 1px;
+  }
+
+  .solving-move-hint--compact .solving-move-hint-toolbar {
+    grid-column: 2 / -1;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: var(--solving-hint-gap);
+    flex: unset;
+    min-width: 0;
+  }
+
+  .solving-move-hint--compact .solving-move-hint-nav {
+    display: flex;
+    align-items: center;
+    gap: var(--solving-hint-gap);
+    flex: 0 1 auto;
+    justify-content: flex-end;
+    min-width: 0;
+  }
+
+  .solving-move-hint--compact .solving-move-hint-autoplay-toggle {
+    flex-direction: row;
+    align-items: center;
+    gap: 5px;
+    flex-shrink: 1;
+    min-width: 0;
+    min-height: var(--touch-target-min);
+  }
+
+  .solving-move-hint--compact .solving-move-hint-autoplay-label {
+    font-size: 10px;
+    line-height: 1.15;
+    white-space: nowrap;
+  }
+
+  .solving-move-hint--compact .solving-move-hint-autoplay-switch {
+    width: 36px;
+    height: 20px;
+    flex-shrink: 0;
+  }
+
+  .solving-move-hint--compact .solving-move-hint-autoplay-switch::after {
+    top: 2px;
+    left: 2px;
+    width: 16px;
+    height: 16px;
+  }
+
+  .solving-move-hint--compact
+    .solving-move-hint-autoplay-input:checked
+    + .solving-move-hint-autoplay-switch::after {
+    transform: translateX(16px);
+  }
+
+  .solving-move-hint--compact .solving-move-hint-prev {
+    flex: 1;
+    max-width: 72px;
+    padding: 8px 10px;
+  }
+
+  .solving-move-hint--compact .solving-move-hint-next {
+    flex: 1;
+    max-width: 72px;
+    padding: 8px 10px;
+    background: rgba(255, 255, 255, 0.92);
+    color: #111;
+    font-weight: 700;
+  }
+
+  .solving-move-hint--compact .solving-move-hint-stage-side--balance {
+    grid-column: 1;
+  }
+
+  .solving-move-hint--compact .solving-move-hint-stage-center {
+    grid-column: 2;
+  }
+
+  .solving-move-hint--compact .solving-move-hint-stage-side--move {
+    grid-column: 3;
+    padding-right: 4px;
+  }
+
+  .solving-move-hint--compact .solving-cube-guide-shell--compact {
+    --solving-cube-shell-height-mobile: 148px;
+    height: var(--solving-cube-shell-height-mobile);
+    width: 100%;
+    min-width: 0;
+  }
+
+  .solving-move-hint--compact .solving-move-hint-move--side {
+    font-size: 17px;
+    line-height: 1.15;
+    text-align: center;
+  }
+
+  .solving-move-hint-stage--compact {
+    padding-bottom: 0;
+  }
+
+  .color-learn-prompt {
+    font-size: 14px;
+  }
+
+  .scan-ready-panel--below,
+  .color-learn-below-guide {
+    gap: 10px;
+  }
+}
+
+@media (pointer: coarse) {
+  .solving-move-hint-prev,
+  .solving-move-hint-next {
+    min-height: var(--touch-target-min);
+    padding: 10px 16px;
+    font-size: 14px;
+  }
+
+  .capture-button {
+    min-height: var(--touch-target-min);
+    padding: 14px 18px;
+    font-size: 16px;
+  }
+
+  .face-grid-mini--clickable {
+    min-width: var(--touch-target-min);
+    min-height: var(--touch-target-min);
+  }
+}

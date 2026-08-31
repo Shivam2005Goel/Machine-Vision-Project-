@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>AR Demo</title>
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body { background: #111; overflow: hidden; }
+      .viewport {
+        position: relative;
+        width: 390px;
+        height: 844px;
+        margin: 0 auto;
+        background: linear-gradient(160deg, #2a2a2a 0%, #0d0d0d 55%, #1a1a1a 100%);
+        overflow: hidden;
+      }
+      .camera-feed {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transform: scaleX(-1);
+        opacity: 0.92;
+      }
+      .cube-ar-overlay {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        transform: scaleX(-1);
+        pointer-events: none;
+      }
+      .solving-banner {
+        position: absolute;
+        bottom: 28px;
+        left: 50%;
+        transform: translateX(-50%);
+        text-align: center;
+        padding: 16px 24px;
+        border-radius: 16px;
+        background: rgba(0, 0, 0, 0.65);
+        backdrop-filter: blur(12px);
+        color: #fff;
+        min-width: 280px;
+        z-index: 8;
+      }
+      .solving-move { font-size: 32px; font-weight: 700; }
+      .solving-description { font-size: 14px; opacity: 0.85; margin: 4px 0 6px; }
+      .solving-hint { font-size: 13px; opacity: 0.75; }
+      .step-indicator {
+        position: absolute;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 8px 16px;
+        border-radius: 999px;
+        background: rgba(0,0,0,0.55);
+        color: #fff;
+        font-size: 13px;
+        z-index: 8;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="viewport">
+      <canvas id="bg" class="camera-feed"></canvas>
+      <canvas id="ar" class="cube-ar-overlay"></canvas>
+      <div class="step-indicator">Step 3 / 18</div>
+      <div class="solving-banner">
+        <p class="solving-move">R</p>
+        <p class="solving-description">Turn Right clockwise</p>
+        <p class="solving-hint">Follow the highlighted face and arrow</p>
+      </div>
+    </div>
+    <script type="module">
+      import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.175.0/build/three.module.js';
+
+      const W = 390, H = 844;
+      const bg = document.getElementById('bg');
+      const ar = document.getElementById('ar');
+      bg.width = W; bg.height = H;
+
+      const bctx = bg.getContext('2d');
+      const g = bctx.createLinearGradient(0, 0, W, H);
+      g.addColorStop(0, '#3d3d3d');
+      g.addColorStop(0.5, '#1e1e1e');
+      g.addColorStop(1, '#2b2b2b');
+      bctx.fillStyle = g;
+      bctx.fillRect(0, 0, W, H);
+
+      const cx = W * 0.5, cy = H * 0.46, size = 168;
+      const faces = [
+        ['#ffffff','#ff6600','#009b48','#ffffff','#ff0000','#0066ff','#ff0000','#ffff00','#ff6600'],
+        ['#ffff00','#ffff00','#ffff00','#ff0000','#ff0000','#ff0000','#ff0000','#ff0000','#ff0000'],
+        ['#009b48','#009b48','#009b48','#009b48','#009b48','#009b48','#009b48','#009b48','#009b48'],
+      ];
+      const cell = size / 3;
+      const ox = cx - size / 2, oy = cy - size / 2;
+      for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++) {
+        bctx.fillStyle = faces[0][r * 3 + c];
+        bctx.fillRect(ox + c * cell + 2, oy + r * cell + 2, cell - 4, cell - 4);
+      }
+      bctx.strokeStyle = 'rgba(0,0,0,0.35)';
+      bctx.lineWidth = 2;
+      bctx.strokeRect(ox, oy, size, size);
+
+      const renderer = new THREE.WebGLRenderer({ canvas: ar, alpha: true, antialias: true });
+      renderer.setSize(W, H, false);
+      renderer.setClearColor(0, 0);
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(52, W / H, 0.01, 100);
+      camera.position.set(0, 0, 2.8);
+      camera.lookAt(0, 0, 0);
+
+      const cubeRoot = new THREE.Group();
+      cubeRoot.rotation.set(-0.35, 0.55, 0.12);
+      cubeRoot.position.set(0.05, 0.08, 0);
+      scene.add(cubeRoot);
+
+      const Hf = 0.5;
+      const verts = [
+        [-Hf,Hf,Hf],[Hf,Hf,Hf],[Hf,Hf,-Hf],[-Hf,Hf,-Hf],
+        [-Hf,-Hf,Hf],[Hf,-Hf,Hf],[Hf,-Hf,-Hf],[-Hf,-Hf,-Hf],
+      ];
+      const edges = [[0,1],[1,2],[2,3],[3,0],[4,5],[5,6],[6,7],[7,4],[0,4],[1,5],[2,6],[3,7]];
+      const pos = [];
+      for (const [a,b] of edges) {
+        pos.push(...verts[a], ...verts[b]);
+      }
+      const lineGeo = new THREE.BufferGeometry();
+      lineGeo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+      cubeRoot.add(new THREE.LineSegments(lineGeo, new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.95 })));
+
+      const faceSpecs = {
+        F: [0,0,0.501,0,0,0], R: [0.501,0,0,0,Math.PI/2,0], U: [0,0.501,0,-Math.PI/2,0,0],
+        L: [-0.501,0,0,0,-Math.PI/2,0], D: [0,-0.501,0,Math.PI/2,0,0], B: [0,0,-0.501,0,Math.PI,0],
+      };
+      for (const [id, spec] of Object.entries(faceSpecs)) {
+        const mat = new THREE.MeshBasicMaterial({
+          color: id === 'R' ? 0xffee55 : 0x88ccff,
+          transparent: true,
+          opacity: id === 'R' ? 0.42 : 0.12,
+          side: THREE.DoubleSide,
+          depthWrite: false,
+        });
+        const mesh = new THREE.Mesh(new THREE.PlaneGeometry(0.98, 0.98), mat);
+        mesh.position.set(spec[0], spec[1], spec[2]);
+        mesh.rotation.set(spec[3], spec[4], spec[5]);
+        cubeRoot.add(mesh);
+      }
+
+      const arrow = new THREE.Group();
+      arrow.position.set(0.52, 0, 0);
+      arrow.rotation.set(0, Math.PI / 2, 0);
+      const arcPts = [];
+      for (let i = 0; i <= 32; i++) {
+        const t = (Math.PI / 2) * (i / 32) * 0.55;
+        arcPts.push(new THREE.Vector3(Math.cos(t) * 0.34, Math.sin(t) * 0.34, 0));
+      }
+      const curve = new THREE.CatmullRomCurve3(arcPts);
+      arrow.add(new THREE.Mesh(
+        new THREE.TubeGeometry(curve, 24, 0.035, 10, false),
+        new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.95 }),
+      ));
+      arrow.add(new THREE.Mesh(
+        new THREE.RingGeometry(0.36, 0.43, 48),
+        new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.5, side: THREE.DoubleSide }),
+      ));
+      cubeRoot.add(arrow);
+
+      renderer.render(scene, camera);
+    </script>
+  </body>
+</html>
