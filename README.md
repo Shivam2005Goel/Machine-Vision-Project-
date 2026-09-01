@@ -63,14 +63,14 @@ npm run preview
 
 ```
 src/
-├── components/       # UI overlays, camera stream, 3D AR viewport, step indicators
-├── hooks/            # Custom hooks (useWebcam, useCubeApp, useConfirmKey)
+├── components/       # UI overlays, camera stream, 3D AR viewport, step indicators
+├── hooks/            # Custom hooks (useWebcam, useCubeApp, useConfirmKey)
 ├── lib/
-│   ├── cube/         # Cube state representation, color validation, solver client
-│   ├── vision/       # OpenCV.js detectors, color classifier, optical flow, pose smoothing
-│   └── three/        # Three.js AR renderers, dynamic shaders, 3D guide arrows
-├── workers/          # Web Workers running solver & solve probe asynchronously
-└── types/            # TypeScript interface & OpenCV definitions
+│   ├── cube/         # Cube state representation, color validation, solver client
+│   ├── vision/       # OpenCV.js detectors, color classifier, optical flow, pose smoothing
+│   └── three/        # Three.js AR renderers, dynamic shaders, 3D guide arrows
+├── workers/          # Web Workers running solver & solve probe asynchronously
+└── types/            # TypeScript interface & OpenCV definitions
 ```
 
 ---
@@ -91,3 +91,6 @@ Connect this repository directly to Vercel or Netlify for instantaneous one-clic
 ## 📄 License
 
 MIT License
+
+
+IMPEOVW IT ENHANCE IT MAKR IT BETTER AND DETAILED  README 
